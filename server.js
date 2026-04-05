@@ -54,7 +54,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const onlineUsers = new Map();
 const rateLimits  = new Map();
-const MAX_CHAT_MESSAGES = Math.max(100, Number(process.env.MAX_CHAT_MESSAGES || 1000));
 
 function checkRateLimit(userId) {
   const now = Date.now();
@@ -128,9 +127,8 @@ async function startApp() {
 
   // ─────────────────────────────────────────────
   // Routes
-  // NOTE: No app.get('/') here — routes/index.js handles '/' and
-  // renders the study page publicly with no login required.
-  // Only /secret/* needs authentication (handled inside secret.js).
+  // routes/index.js handles '/' publicly — no login required
+  // Only /secret/* needs authentication (handled inside secret.js)
   // ─────────────────────────────────────────────
   app.use('/',       require('./routes/index'));
   app.use('/class',  require('./routes/class'));
@@ -141,6 +139,10 @@ async function startApp() {
 
   // ─────────────────────────────────────────────
   // Socket.io
+  // Messages are stored permanently in MongoDB.
+  // No automatic pruning — chats are kept forever
+  // until manually wiped by admin or Atlas storage
+  // is full (free tier = 512MB).
   // ─────────────────────────────────────────────
   let Message = null;
 
@@ -151,25 +153,6 @@ async function startApp() {
         Message = require('./models/Message');
       }
     } catch {}
-  }
-
-  async function pruneOldMessages(room = null) {
-    tryLoadMessage();
-    if (!Message) return;
-
-    const filter = room ? { room } : {};
-    const count = await Message.countDocuments(filter);
-
-    if (count <= MAX_CHAT_MESSAGES) return;
-
-    const excess = count - MAX_CHAT_MESSAGES;
-
-    const oldest = await Message.find(filter)
-      .sort({ createdAt: 1 })
-      .limit(excess)
-      .select({ _id: 1 });
-
-    await Message.deleteMany({ _id: { $in: oldest.map(m => m._id) } });
   }
 
   io.on('connection', (socket) => {
@@ -208,10 +191,10 @@ async function startApp() {
 
       tryLoadMessage();
 
+      // Save message permanently — no pruning after save
       if (Message) {
         const saved = await new Message(msgData).save();
         msgData._id = saved._id.toString();
-        await pruneOldMessages();
       }
 
       io.to(user.room).emit('message', msgData);
