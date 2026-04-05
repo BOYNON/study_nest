@@ -15,10 +15,14 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // ─────────────────────────────────────────────
-// FIX: HOMEPAGE ROUTE (THIS WAS MISSING)
+// FIX 1: ROOT ROUTE — redirect based on login state
 // ─────────────────────────────────────────────
-app.get('/', (_req, res) => {
-  res.redirect('/secret/enter');
+app.get('/', (req, res) => {
+  if (req.session && req.session.userId) {
+    res.redirect('/class');         // already logged in → study page
+  } else {
+    res.redirect('/secret/enter'); // not logged in → login page
+  }
 });
 
 // ─────────────────────────────────────────────
@@ -109,6 +113,9 @@ async function buildSessionStore() {
 async function startApp() {
 
   const store = await buildSessionStore();
+
+  // FIX 2: trust proxy — required for secure cookies behind Render's HTTPS
+  app.set('trust proxy', 1);
 
   const sessionMiddleware = session({
     name:'studynest.sid',
