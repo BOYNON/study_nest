@@ -1,31 +1,91 @@
 /* ============================================================
-   StudyNest — Chat UI JS (Phase 2)
-   Handles: local message rendering, image upload preview,
-            link sharing, image modal, delete messages
-   Phase 3 will replace local rendering with Socket.io
+   StudyNest — Chat UI JS (Phase 3)
+   Handles: Socket.io messaging, history loading,
+            image upload, link sharing, image modal,
+            delete messages
    ============================================================ */
 
 (function () {
   'use strict';
 
-  const messagesEl  = document.getElementById('chatMessages');
-  const inputEl     = document.getElementById('chatInput');
-  const sendBtn     = document.getElementById('sendBtn');
-  const imgBtn      = document.getElementById('imgUploadBtn');
-  const imgFileInput= document.getElementById('imageFileInput');
-  const linkBtn     = document.getElementById('linkBtn');
-  const linkDialog  = document.getElementById('linkDialog');
-  const linkInput   = document.getElementById('linkInput');
-  const linkSendBtn = document.getElementById('linkSendBtn');
-  const linkCancel  = document.getElementById('linkCancelBtn');
-  const imgModal    = document.getElementById('imgModal');
-  const imgModalSrc = document.getElementById('imgModalSrc');
+  const messagesEl        = document.getElementById('chatMessages');
+  const inputEl           = document.getElementById('chatInput');
+  const sendBtn           = document.getElementById('sendBtn');
+  const imgBtn            = document.getElementById('imgUploadBtn');
+  const imgFileInput      = document.getElementById('imageFileInput');
+  const linkBtn           = document.getElementById('linkBtn');
+  const linkDialog        = document.getElementById('linkDialog');
+  const linkInput         = document.getElementById('linkInput');
+  const linkSendBtn       = document.getElementById('linkSendBtn');
+  const linkCancel        = document.getElementById('linkCancelBtn');
+  const imgModal          = document.getElementById('imgModal');
+  const imgModalSrc       = document.getElementById('imgModalSrc');
   const imgModalClose     = document.getElementById('imgModalClose');
   const imgModalCloseBtn  = document.getElementById('imgModalCloseBtn');
 
-  // ── Helpers ─────────────────────────────────────────────
-  function now() {
-    return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  // ── Socket.io connection ─────────────────────────────────
+  const socket = io({ transports: ['websocket', 'polling'] });
+
+  socket.on('connect', () => {
+    console.log('✅ Socket connected:', socket.id);
+    loadHistory();
+  });
+
+  socket.on('connect_error', (err) => {
+    console.error('Socket error:', err.message);
+  });
+
+  // ── Load chat history from server on page open ───────────
+  async function loadHistory() {
+    try {
+      const res  = await fetch('/api/messages?room=general&limit=200');
+      const data = await res.json();
+      if (!data.messages || !data.messages.length) return;
+
+      messagesEl.innerHTML = ''; // clear any placeholder
+
+      data.messages.forEach(msg => {
+        renderMessage({
+          text:        msg.text,
+          imageUrl:    msg.imageUrl,
+          linkUrl:     msg.linkUrl,
+          voiceUrl:    msg.voiceUrl,
+          isOwn:       msg.sender?.id === CURRENT_USER.id,
+          displayName: msg.sender?.displayName || 'Unknown',
+          avatarColor: msg.sender?.avatarColor || '#6366f1',
+          msgId:       msg._id,
+          timestamp:   msg.createdAt,
+        });
+      });
+
+      scrollToBottom();
+    } catch (err) {
+      console.error('Failed to load history:', err);
+    }
+  }
+
+  // ── Receive messages from other users via socket ─────────
+  socket.on('message', (msg) => {
+    // Don't double-render own messages (already rendered on send)
+    if (msg.sender?.id === CURRENT_USER.id) return;
+
+    renderMessage({
+      text:        msg.text,
+      imageUrl:    msg.imageUrl,
+      linkUrl:     msg.linkUrl,
+      voiceUrl:    msg.voiceUrl,
+      isOwn:       false,
+      displayName: msg.sender?.displayName || 'Unknown',
+      avatarColor: msg.sender?.avatarColor || '#6366f1',
+      msgId:       msg._id,
+      timestamp:   msg.createdAt,
+    });
+  });
+
+  // ── Helpers ──────────────────────────────────────────────
+  function formatTime(ts) {
+    const d = ts ? new Date(ts) : new Date();
+    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   }
 
   function scrollToBottom() {
@@ -45,8 +105,14 @@
     return m ? m[1] : null;
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   // ── Render a message bubble ──────────────────────────────
-  function renderMessage({ text, imageUrl, linkUrl, isOwn, displayName, avatarColor, msgId }) {
+  function renderMessage({ text, imageUrl, linkUrl, isOwn, displayName, avatarColor, msgId, timestamp }) {
     const isAdmin = CURRENT_USER.role === 'admin';
     const wrapper = document.createElement('div');
     wrapper.className = `chat-msg${isOwn ? ' own' : ''}`;
@@ -62,8 +128,10 @@
 
     const header = document.createElement('div');
     header.className = 'chat-msg-header';
-    header.innerHTML = `<span class="chat-msg-name">${escapeHtml(displayName)}</span><span class="chat-msg-time">${now()}</span>`;
-
+    header.innerHTML = `
+      <span class="chat-msg-name">${escapeHtml(displayName)}</span>
+      <span class="chat-msg-time">${formatTime(timestamp)}</span>
+    `;
     body.appendChild(header);
 
     // Text content
@@ -97,14 +165,18 @@
         if (ytId) {
           preview.innerHTML = `
             <div style="font-size:.78rem;color:var(--text-3);margin-bottom:6px">🎥 YouTube Video</div>
-            <img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" style="width:100%;border-radius:6px;margin-bottom:6px;cursor:pointer" onclick="window.open('${escapeHtml(linkUrl)}','_blank')" alt="YT thumbnail"/>
-            <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener" style="font-size:.8rem;color:var(--math-fg)">${escapeHtml(linkUrl)}</a>
+            <img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg"
+              style="width:100%;border-radius:6px;margin-bottom:6px;cursor:pointer"
+              onclick="window.open('${escapeHtml(linkUrl)}','_blank')" alt="YT thumbnail"/>
+            <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener"
+              style="font-size:.8rem;color:var(--math-fg)">${escapeHtml(linkUrl)}</a>
           `;
         }
       } else {
         preview.innerHTML = `
           <div style="font-size:.78rem;color:var(--text-3);margin-bottom:4px">🔗 Link</div>
-          <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener" style="font-size:.82rem;color:var(--math-fg);word-break:break-all">${escapeHtml(linkUrl)}</a>
+          <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener"
+            style="font-size:.82rem;color:var(--math-fg);word-break:break-all">${escapeHtml(linkUrl)}</a>
         `;
       }
       body.appendChild(preview);
@@ -120,7 +192,6 @@
         wrapper.style.transform = 'translateX(-10px)';
         wrapper.style.transition = 'all .25s ease';
         setTimeout(() => wrapper.remove(), 250);
-        // Phase 3: emit delete event via socket
       });
       wrapper.appendChild(avatar);
       wrapper.appendChild(body);
@@ -143,26 +214,24 @@
     });
   }
 
-  function escapeHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
   // ── Send text message ────────────────────────────────────
   function sendMessage() {
     const text = inputEl.textContent.trim();
     if (!text) return;
 
+    // Render immediately for sender (optimistic UI)
     renderMessage({
       text,
-      isOwn: true,
+      isOwn:       true,
       displayName: CURRENT_USER.displayName,
       avatarColor: CURRENT_USER.avatarColor,
     });
 
+    // Actually send via socket to server + save to MongoDB
+    socket.emit('message', { text, room: 'general' });
+
     inputEl.textContent = '';
     inputEl.focus();
-
-    // Phase 3: socket.emit('message', { text, room: 'general' });
   }
 
   if (sendBtn) sendBtn.addEventListener('click', sendMessage);
@@ -180,24 +249,56 @@
   if (imgBtn && imgFileInput) {
     imgBtn.addEventListener('click', () => imgFileInput.click());
 
-    imgFileInput.addEventListener('change', () => {
+    imgFileInput.addEventListener('change', async () => {
       const file = imgFileInput.files[0];
       if (!file) return;
       if (file.size > 5 * 1024 * 1024) {
         alert('Image too large. Max size is 5MB.');
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        renderMessage({
-          imageUrl: e.target.result,
-          isOwn: true,
-          displayName: CURRENT_USER.displayName,
-          avatarColor: CURRENT_USER.avatarColor,
-        });
-        // Phase 3: upload to server, then emit via socket
-      };
-      reader.readAsDataURL(file);
+
+      // Upload to Cloudinary first, then emit URL via socket
+      const cloudName    = (window.CLOUDINARY_CLOUD_NAME    || '').trim();
+      const uploadPreset = (window.CLOUDINARY_UPLOAD_PRESET || '').trim();
+
+      if (cloudName && uploadPreset) {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', uploadPreset);
+
+          const res  = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: 'POST', body: formData,
+          });
+          const data = await res.json();
+          const imageUrl = data.secure_url;
+
+          renderMessage({
+            imageUrl,
+            isOwn:       true,
+            displayName: CURRENT_USER.displayName,
+            avatarColor: CURRENT_USER.avatarColor,
+          });
+
+          socket.emit('message', { imageUrl, room: 'general' });
+        } catch (err) {
+          alert('Image upload failed. Check Cloudinary settings.');
+          console.error(err);
+        }
+      } else {
+        // Fallback: show locally only (no Cloudinary configured)
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          renderMessage({
+            imageUrl:    e.target.result,
+            isOwn:       true,
+            displayName: CURRENT_USER.displayName,
+            avatarColor: CURRENT_USER.avatarColor,
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+
       imgFileInput.value = '';
     });
   }
@@ -210,21 +311,26 @@
     });
   }
 
-  if (linkCancel) linkCancel.addEventListener('click', () => { linkDialog.style.display = 'none'; });
+  if (linkCancel) {
+    linkCancel.addEventListener('click', () => { linkDialog.style.display = 'none'; });
+  }
 
   if (linkSendBtn && linkInput) {
     linkSendBtn.addEventListener('click', () => {
       const url = linkInput.value.trim();
       if (!url || !isURL(url)) { alert('Please enter a valid URL.'); return; }
+
       renderMessage({
-        linkUrl: url,
-        isOwn: true,
+        linkUrl:     url,
+        isOwn:       true,
         displayName: CURRENT_USER.displayName,
         avatarColor: CURRENT_USER.avatarColor,
       });
+
+      socket.emit('message', { linkUrl: url, room: 'general' });
+
       linkInput.value = '';
       linkDialog.style.display = 'none';
-      // Phase 3: socket.emit('message', { linkUrl: url });
     });
 
     linkInput.addEventListener('keydown', (e) => {
@@ -242,14 +348,13 @@
   if (imgModalClose)    imgModalClose.addEventListener('click',    () => { imgModal.style.display = 'none'; });
   if (imgModalCloseBtn) imgModalCloseBtn.addEventListener('click', () => { imgModal.style.display = 'none'; });
 
-  // Close modal on ESC is handled by session.js (panic), so only close modal here
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && imgModal && imgModal.style.display !== 'none') {
       imgModal.style.display = 'none';
     }
   });
 
-  // ── Auto-scroll on load ──────────────────────────────────
   scrollToBottom();
 
 })();
+
