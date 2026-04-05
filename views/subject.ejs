@@ -1,0 +1,69 @@
+<%- include('partials/header') %>
+<main>
+<div class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="/">Home</a><span class="sep">›</span>
+      <a href="/class/<%= classNum %>">Class <%= classNum %></a><span class="sep">›</span>
+      <span><%= subjectName %></span>
+    </nav>
+    <h1><%= subjectIcon %> <em><%= subjectName %></em></h1>
+    <p>Class <%= classNum %> · DAV Syllabus</p>
+    <div class="page-hero-meta">
+      <% if (chapters.length > 0) { %>
+      <span class="hero-tag">📑 <%= chapters.length %> Chapters</span>
+      <% } %>
+      <span class="hero-tag">📝 Notes</span>
+      <span class="hero-tag">🏆 PYQs</span>
+      <span class="hero-tag">📄 Worksheet</span>
+      <span class="hero-tag">📚 Book</span>
+      <span class="hero-tag">❓ Book Q&A</span>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content">
+  <div class="subject-resource-strip">
+    <div class="section-header center">
+      <h2>Subject Resources</h2>
+      <p>Every chapter keeps the same study flow: notes, PYQ, worksheet, book, and book Q&A.</p>
+    </div>
+    <div class="resource-chip-grid">
+      <span class="resource-chip">📝 Notes</span>
+      <span class="resource-chip">🏆 PYQ</span>
+      <span class="resource-chip">📄 Worksheet</span>
+      <span class="resource-chip">📚 Book</span>
+      <span class="resource-chip">❓ Book Q&A</span>
+    </div>
+  </div>
+
+  <% if (chapters.length === 0) { %>
+  <div class="coming-soon">
+    <div class="cs-icon">📚✨</div>
+    <h2>Coming Soon!</h2>
+    <p>Content for Class <%= classNum %> <%= subjectName %> is being prepared. Check back soon!</p>
+    <a href="/class/<%= classNum %>" class="btn-outline">← Back to Subjects</a>
+  </div>
+  <% } else { %>
+  <div class="chapter-list">
+    <% chapters.forEach(ch => { %>
+    <a href="/class/<%= classNum %>/<%= subject %>/<%= ch.id %>" class="chapter-card">
+      <div class="chapter-num-badge">Ch <%= ch.id %></div>
+      <div class="chapter-body">
+        <div class="chapter-title"><%= ch.title %></div>
+        <div class="chapter-tags">
+          <% if (ch.notes && ch.notes.length > 0) { %><span class="ctag ctag-notes">📝 <%= ch.notes.length %> Notes</span><% } %>
+          <% if (ch.pyqs && ch.pyqs.length > 0) { %><span class="ctag ctag-pyq">🏆 <%= ch.pyqs.length %> PYQs</span><% } %>
+          <% if (ch.worksheet && ch.worksheet.length > 0) { %><span class="ctag ctag-worksheet">📄 Worksheet</span><% } %>
+          <% if (ch.bookPdf) { %><span class="ctag ctag-pdf">📚 Book</span><% } %>
+          <% if (ch.bookQna && ch.bookQna.length > 0) { %><span class="ctag ctag-qna">❓ Book Q&A</span><% } %>
+        </div>
+      </div>
+      <div class="chapter-caret">›</div>
+    </a>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+</main>
+<%- include('partials/footer') %>

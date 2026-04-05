@@ -1,0 +1,132 @@
+<%- include('partials/header') %>
+<main>
+<div class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="/">Home</a><span class="sep">›</span>
+      <a href="/class/<%= classNum %>">Class <%= classNum %></a><span class="sep">›</span>
+      <a href="/class/<%= classNum %>/<%= subject %>"><%= subjectName %></a><span class="sep">›</span>
+      <span>Chapter <%= chapter.id %></span>
+    </nav>
+    <h1><%= subjectIcon %> <%= chapter.title %></h1>
+    <p>Class <%= classNum %> · <%= subjectName %> · Chapter <%= chapter.id %></p>
+  </div>
+</div>
+
+<div class="container page-content">
+  <div class="tab-nav resource-tabs">
+    <button class="tab-btn <%= tab==='notes'?'active':'' %>" onclick="switchTab('notes')">📝 Notes</button>
+    <button class="tab-btn <%= tab==='pyq'?'active':'' %>" onclick="switchTab('pyq')">🏆 PYQs</button>
+    <button class="tab-btn <%= tab==='worksheet'?'active':'' %>" onclick="switchTab('worksheet')">📄 Worksheet</button>
+    <button class="tab-btn <%= tab==='book'?'active':'' %>" onclick="switchTab('book')">📚 Book</button>
+    <button class="tab-btn <%= tab==='book-qna'?'active':'' %>" onclick="switchTab('book-qna')">❓ Book Q&A</button>
+  </div>
+
+  <div id="tab-notes" class="tab-content" style="<%= tab!=='notes'?'display:none':'' %>">
+    <% if (!chapter.notes || chapter.notes.length===0) { %>
+    <div class="coming-soon"><div class="cs-icon">📚✨</div><h2>Coming Soon!</h2><p>Notes for this chapter are being prepared.</p></div>
+    <% } else { %>
+    <% chapter.notes.forEach((n) => { %>
+    <div class="note-card">
+      <div class="note-header">
+        <span class="note-pin">📌</span>
+        <span class="note-title-text"><%= n.title %></span>
+      </div>
+      <div class="note-body markdown-content"><%- renderMarkdown(n.content) %></div>
+    </div>
+    <% }) %>
+    <% } %>
+  </div>
+
+  <div id="tab-pyq" class="tab-content" style="<%= tab!=='pyq'?'display:none':'' %>">
+    <% if (!chapter.pyqs || chapter.pyqs.length===0) { %>
+    <div class="coming-soon"><div class="cs-icon">📚✨</div><h2>Coming Soon!</h2><p>Previous year questions will be added soon.</p></div>
+    <% } else { %>
+    <div class="pyq-header-bar">🏆 <strong><%= chapter.pyqs.length %> questions</strong> from previous board/school exams — study these carefully!</div>
+    <% chapter.pyqs.forEach((q, i) => { %>
+    <div class="pyq-card">
+      <div class="pyq-meta">
+        <span class="pyq-year-badge">📅 <%= q.year %></span>
+        <span class="pyq-marks-badge"><%= q.marks %> mark<%= q.marks!==1?'s':'' %></span>
+      </div>
+      <div class="pyq-q"><span class="pyq-q-num">Q<%= i+1 %>.</span> <%= q.question %></div>
+      <details class="pyq-toggle">
+        <summary>👁 View Answer</summary>
+        <div class="pyq-answer"><strong>Answer:</strong> <%= q.answer %></div>
+      </details>
+    </div>
+    <% }) %>
+    <% } %>
+  </div>
+
+  <div id="tab-worksheet" class="tab-content" style="<%= tab!=='worksheet'?'display:none':'' %>">
+    <% if (!chapter.worksheet || chapter.worksheet.length===0) { %>
+    <div class="coming-soon"><div class="cs-icon">📝</div><h2>Coming Soon!</h2><p>Worksheet practice sets for this chapter will be added soon.</p></div>
+    <% } else { %>
+    <% chapter.worksheet.forEach((w, i) => { %>
+    <div class="note-card">
+      <div class="note-header">
+        <span class="note-pin">📝</span>
+        <span class="note-title-text"><%= w.title || ('Worksheet ' + (i + 1)) %></span>
+      </div>
+      <div class="note-body markdown-content"><%- renderMarkdown(w.content || '') %></div>
+    </div>
+    <% }) %>
+    <% } %>
+  </div>
+
+  <div id="tab-book" class="tab-content" style="<%= tab!=='book'?'display:none':'' %>">
+    <% if (!chapter.bookPdf) { %>
+    <div class="coming-soon"><div class="cs-icon">📚✨</div><h2>Coming Soon!</h2><p>Book PDF for this chapter will be uploaded soon.</p></div>
+    <% } else { %>
+    <div class="pdf-actions">
+      <a href="<%= chapter.bookPdf %>" target="_blank" class="btn-primary">📥 Download PDF</a>
+      <a href="<%= chapter.bookPdf %>" target="_blank" class="btn-secondary">🔗 Open in Tab</a>
+    </div>
+    <iframe class="pdf-iframe" src="<%= chapter.bookPdf %>" title="Book PDF"></iframe>
+    <% } %>
+  </div>
+
+  <div id="tab-book-qna" class="tab-content" style="<%= tab!=='book-qna'?'display:none':'' %>">
+    <% if (!chapter.bookQna || chapter.bookQna.length===0) { %>
+    <div class="coming-soon"><div class="cs-icon">❓</div><h2>Coming Soon!</h2><p>Book Q&A for this chapter will be added soon.</p></div>
+    <% } else { %>
+    <% chapter.bookQna.forEach((q, i) => { %>
+    <div class="pyq-card">
+      <div class="pyq-meta">
+        <span class="pyq-year-badge">Q&A <%= i + 1 %></span>
+      </div>
+      <div class="pyq-q"><span class="pyq-q-num">Q<%= i+1 %>.</span> <%= q.question %></div>
+      <details class="pyq-toggle">
+        <summary>👁 View Answer</summary>
+        <div class="pyq-answer"><strong>Answer:</strong> <%= q.answer %></div>
+      </details>
+    </div>
+    <% }) %>
+    <% } %>
+  </div>
+
+  <div class="ai-nudge">
+    <div class="ai-nudge-text">
+      <h4>💡 Still confused about something?</h4>
+      <p>Ask our AI helper any question from this chapter!</p>
+    </div>
+    <a href="/ai-helper?subject=<%= subjectName %>&class=<%= classNum %>&chapter=<%= encodeURIComponent(chapter.title) %>" class="btn-outline">Open AI Helper →</a>
+  </div>
+</div>
+</main>
+
+<script>
+function switchTab(name) {
+  ['notes','pyq','worksheet','book','book-qna'].forEach(t => {
+    const panel = document.getElementById('tab-' + t);
+    if (panel) panel.style.display = t === name ? '' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b) => {
+    const target = b.getAttribute('onclick') || '';
+    b.classList.toggle('active', target.includes(`'${name}'`));
+  });
+  history.replaceState(null, '', '?tab=' + name);
+}
+</script>
+<%- include('partials/footer') %>

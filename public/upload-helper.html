@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudyNest Upload Helper</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117; --surface: #1a1d24; --surface2: #222630;
+      --border: #2e3444; --text: #e2e8f0; --text2: #94a3b8; --text3: #64748b;
+      --accent: #25d366; --accent2: #4f9cf7; --red: #f04747; --orange: #f59e0b;
+      --radius: 12px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
+    .page-header { text-align: center; margin-bottom: 32px; }
+    .page-header h1 { font-size: 1.6rem; font-weight: 700; color: var(--text); }
+    .page-header p { color: var(--text2); font-size: .9rem; margin-top: 6px; }
+    .page-header .badge { display: inline-block; background: var(--red); color: #fff; font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-bottom: 10px; letter-spacing: .05em; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; margin: 0 auto; }
+    @media(max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .card-icon { font-size: 1.4rem; }
+    .card-title { font-size: 1rem; font-weight: 600; }
+    .card-sub { font-size: .78rem; color: var(--text3); margin-top: 2px; }
+
+    label { display: block; font-size: .8rem; color: var(--text2); margin-bottom: 5px; font-weight: 500; }
+    input, select, textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: .875rem;
+      outline: none; font-family: inherit; transition: border-color .15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+    select option { background: var(--surface2); }
+    .field { margin-bottom: 14px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 9px; border: none; font-size: .85rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity .15s, transform .1s; }
+    .btn:hover { opacity: .88; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-green { background: var(--accent); color: #000; }
+    .btn-blue { background: var(--accent2); color: #fff; }
+    .btn-orange { background: var(--orange); color: #000; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    .result-box {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 12px; font-size: .82rem; margin-top: 12px;
+      display: none; word-break: break-all;
+    }
+    .result-box.show { display: block; }
+    .result-box.success { border-color: var(--accent); color: var(--accent); }
+    .result-box.error   { border-color: var(--red);    color: var(--red); }
+    .result-box pre { white-space: pre-wrap; font-family: monospace; font-size: .8rem; color: var(--text); margin-top: 6px; background: var(--bg); padding: 8px; border-radius: 6px; overflow-x: auto; }
+
+    .url-copy-row { display: flex; gap: 6px; margin-top: 8px; }
+    .url-copy-row input { flex: 1; font-size: .78rem; }
+    .url-copy-row .btn { padding: 8px 12px; flex-shrink: 0; font-size: .78rem; }
+
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: 10px; padding: 28px;
+      text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
+      color: var(--text3); font-size: .85rem;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(37,211,102,.05); color: var(--text2); }
+    .drop-zone .dz-icon { font-size: 2rem; margin-bottom: 8px; }
+
+    .progress-wrap { margin-top: 10px; display: none; }
+    .progress-wrap.show { display: block; }
+    .progress-bar { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 5px; }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width .2s; }
+    .progress-text { font-size: .75rem; color: var(--text3); }
+
+    .json-snippet { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 10px; }
+    .json-snippet pre { font-family: monospace; font-size: .78rem; color: var(--accent2); white-space: pre-wrap; }
+    .json-snippet .copy-json-btn { margin-top: 8px; }
+
+    .tip-box { background: rgba(79,156,247,.08); border: 1px solid rgba(79,156,247,.2); border-radius: 8px; padding: 11px 14px; font-size: .8rem; color: var(--text2); margin-bottom: 16px; line-height: 1.55; }
+    .tip-box strong { color: var(--accent2); }
+
+    .section-divider { grid-column: 1 / -1; text-align: center; color: var(--text3); font-size: .8rem; display: flex; align-items: center; gap: 10px; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: .72rem; font-weight: 600; }
+    .tag-cloudinary { background: rgba(37,211,102,.15); color: var(--accent); }
+    .tag-drive { background: rgba(79,156,247,.15); color: var(--accent2); }
+    .tag-json { background: rgba(245,158,11,.15); color: var(--orange); }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="badge">🔐 Admin Only</div>
+  <h1>📚 StudyNest Upload Helper</h1>
+  <p>Easily upload files and get links to paste into <code>content.json</code></p>
+</div>
+
+<div class="grid">
+
+  <!-- ── Cloudinary File Upload ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">☁️</span>
+      <div>
+        <div class="card-title">Upload to Cloudinary <span class="tag tag-cloudinary">Cloudinary</span></div>
+        <div class="card-sub">Images, PDFs, audio — get a permanent public URL</div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>⚠️ Preset required:</strong> You need an <strong>unsigned upload preset</strong> from
+      <a href="https://cloudinary.com" target="_blank" style="color:var(--accent2)">cloudinary.com</a>
+      → Settings → Upload Presets → Create unsigned preset.<br>
+      The preset is the <em>name</em> (e.g. <code>nestchat_uploads</code>), NOT the API secret.
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Cloud Name</label>
+        <input type="text" id="cldCloudName" placeholder="dpy1wxaws" />
+      </div>
+      <div class="field">
+        <label>Upload Preset (unsigned)</label>
+        <input type="text" id="cldPreset" placeholder="nestchat_uploads" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Resource Type</label>
+      <select id="cldResourceType">
+        <option value="image">Image (JPG, PNG, GIF, WebP)</option>
+        <option value="raw">File / PDF / any file</option>
+        <option value="video">Audio / Video (MP3, MP4, WebM)</option>
+        <option value="auto">Auto-detect</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="drop-zone" id="dropZone">
+        <div class="dz-icon">📁</div>
+        <div>Drop a file here or <strong>click to browse</strong></div>
+        <div style="font-size:.75rem;margin-top:4px;color:var(--text3)">Images, PDFs, audio — up to 10MB</div>
+      </div>
+      <input type="file" id="cldFileInput" style="display:none"/>
+    </div>
+
+    <div class="progress-wrap" id="cldProgress">
+      <div class="progress-bar"><div class="progress-fill" id="cldProgressFill"></div></div>
+      <div class="progress-text" id="cldProgressText">Uploading…</div>
+    </div>
+
+    <button class="btn btn-green btn-full" id="cldUploadBtn">☁️ Upload to Cloudinary</button>
+
+    <div class="result-box" id="cldResult">
+      <div id="cldResultMsg"></div>
+      <div class="url-copy-row" id="cldCopyRow" style="display:none">
+        <input type="text" id="cldUrlOutput" readonly/>
+        <button class="btn btn-blue" onclick="copyUrl()">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Google Drive Link Helper ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🗂️</span>
+      <div>
+        <div class="card-title">Google Drive Link Converter <span class="tag tag-drive">Drive</span></div>
+        <div class="card-sub">Convert a Drive share link to a direct embed/download URL</div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>How to get a Drive share link:</strong><br>
+      Right-click file → Share → "Anyone with the link" → Copy link.<br>
+      Paste it below to get a direct URL for the PDF iframe or download button.
+    </div>
+
+    <div class="field">
+      <label>Google Drive Share URL</label>
+      <input type="url" id="driveInput" placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"/>
+    </div>
+
+    <div class="field-row">
+      <button class="btn btn-blue" onclick="convertDrivePreview()">👁 Preview/Embed URL</button>
+      <button class="btn btn-orange" onclick="convertDriveDirect()">📥 Direct Download URL</button>
+    </div>
+
+    <div class="result-box" id="driveResult">
+      <div id="driveResultMsg"></div>
+      <div class="url-copy-row" id="driveCopyRow" style="display:none">
+        <input type="text" id="driveUrlOutput" readonly/>
+        <button class="btn btn-blue" onclick="copyDriveUrl()">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">Generate content.json snippets</div>
+
+  <!-- ── JSON Snippet Generator ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">📝</span>
+      <div>
+        <div class="card-title">Notes Snippet <span class="tag tag-json">JSON</span></div>
+        <div class="card-sub">Generate ready-to-paste JSON for content.json notes</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Note Title</label>
+      <input type="text" id="noteTitle" placeholder="Introduction to Fractions"/>
+    </div>
+    <div class="field">
+      <label>Note Content (supports **bold**, *italic*, - bullets, # headings)</label>
+      <textarea id="noteContent" rows="5" placeholder="A fraction represents a part of a whole.&#10;&#10;**Types:**&#10;- Proper fraction: numerator &lt; denominator&#10;- Improper fraction: numerator &gt; denominator"></textarea>
+    </div>
+    <button class="btn btn-orange btn-full" onclick="genNoteSnippet()">⚡ Generate JSON Snippet</button>
+
+    <div class="json-snippet" id="noteSnippet" style="display:none">
+      <pre id="noteSnippetCode"></pre>
+      <button class="btn btn-blue copy-json-btn" onclick="copySnippet('noteSnippetCode')">📋 Copy JSON</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🏆</span>
+      <div>
+        <div class="card-title">PYQ Snippet <span class="tag tag-json">JSON</span></div>
+        <div class="card-sub">Generate a previous year question entry</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Year</label>
+        <input type="number" id="pyqYear" placeholder="2023" value="2024"/>
+      </div>
+      <div class="field">
+        <label>Marks</label>
+        <input type="number" id="pyqMarks" placeholder="1" value="1"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Question</label>
+      <input type="text" id="pyqQ" placeholder="What is photosynthesis?"/>
+    </div>
+    <div class="field">
+      <label>Answer</label>
+      <textarea id="pyqA" rows="3" placeholder="Photosynthesis is the process by which plants make food using sunlight, water, and carbon dioxide."></textarea>
+    </div>
+    <button class="btn btn-orange btn-full" onclick="genPYQSnippet()">⚡ Generate JSON Snippet</button>
+
+    <div class="json-snippet" id="pyqSnippet" style="display:none">
+      <pre id="pyqSnippetCode"></pre>
+      <button class="btn btn-blue copy-json-btn" onclick="copySnippet('pyqSnippetCode')">📋 Copy JSON</button>
+    </div>
+  </div>
+
+  <!-- ── Book PDF entry ── -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="card-header">
+      <span class="card-icon">📚</span>
+      <div>
+        <div class="card-title">Book PDF / Chapter Setup <span class="tag tag-json">JSON</span></div>
+        <div class="card-sub">Generate a complete chapter skeleton for content.json</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="field">
+        <label>Chapter ID (number)</label>
+        <input type="number" id="chId" value="1"/>
+      </div>
+      <div class="field">
+        <label>Chapter Title</label>
+        <input type="text" id="chTitle" placeholder="Knowing Our Numbers"/>
+      </div>
+      <div class="field">
+        <label>Book PDF URL (optional)</label>
+        <input type="url" id="chPdf" placeholder="https://... or leave blank"/>
+      </div>
+    </div>
+    <button class="btn btn-orange" onclick="genChapterSnippet()">⚡ Generate Chapter Skeleton</button>
+    <div class="json-snippet" id="chSnippet" style="display:none">
+      <pre id="chSnippetCode"></pre>
+      <button class="btn btn-blue copy-json-btn" onclick="copySnippet('chSnippetCode')">📋 Copy JSON</button>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+
+<script>
+// ── Cloudinary Upload ──────────────────────────────────────
+const dropZone    = document.getElementById('dropZone');
+const cldFileInput= document.getElementById('cldFileInput');
+let selectedFile  = null;
+
+dropZone.addEventListener('click', () => cldFileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+});
+cldFileInput.addEventListener('change', () => { if (cldFileInput.files[0]) setFile(cldFileInput.files[0]); });
+
+function setFile(f) {
+  selectedFile = f;
+  dropZone.querySelector('.dz-icon').textContent = '✅';
+  dropZone.querySelector('div:nth-child(2)').textContent = f.name;
+  dropZone.querySelector('div:nth-child(3)').textContent = (f.size/1024/1024).toFixed(2) + ' MB';
+}
+
+document.getElementById('cldUploadBtn').addEventListener('click', async () => {
+  const cloudName = document.getElementById('cldCloudName').value.trim();
+  const preset    = document.getElementById('cldPreset').value.trim();
+  const resType   = document.getElementById('cldResourceType').value;
+
+  if (!cloudName) return showCldResult('error', '❌ Enter your Cloudinary cloud name');
+  if (!preset)    return showCldResult('error', '❌ Enter your upload preset name');
+  if (!selectedFile) return showCldResult('error', '❌ Choose a file first');
+
+  const prog = document.getElementById('cldProgress');
+  const fill = document.getElementById('cldProgressFill');
+  const txt  = document.getElementById('cldProgressText');
+  prog.classList.add('show'); fill.style.width = '10%'; txt.textContent = 'Uploading…';
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+  formData.append('upload_preset', preset);
+
+  try {
+    // Use XHR for progress
+    const url = await new Promise((res, rej) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/${resType}/upload`);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round(e.loaded / e.total * 90);
+          fill.style.width = pct + '%';
+          txt.textContent = `Uploading… ${pct}%`;
+        }
+      };
+      xhr.onload = () => {
+        fill.style.width = '100%';
+        const data = JSON.parse(xhr.responseText || '{}');
+        if (xhr.status >= 400) {
+          const msg = data?.error?.message || `HTTP ${xhr.status}`;
+          if (msg.toLowerCase().includes('preset') || msg.toLowerCase().includes('unknown')) {
+            rej(new Error(`Upload preset "${preset}" not found or is not unsigned.\n\nFix: Go to cloudinary.com → Settings → Upload Presets → create an UNSIGNED preset → copy its NAME here.`));
+          } else {
+            rej(new Error(msg));
+          }
+        } else {
+          res(data.secure_url || data.url);
+        }
+      };
+      xhr.onerror = () => rej(new Error('Network error'));
+      xhr.send(formData);
+    });
+
+    prog.classList.remove('show');
+    document.getElementById('cldUrlOutput').value = url;
+    document.getElementById('cldCopyRow').style.display = 'flex';
+    showCldResult('success', `✅ Uploaded! URL is ready to copy:`);
+  } catch (err) {
+    prog.classList.remove('show');
+    showCldResult('error', '❌ ' + err.message);
+  }
+});
+
+function showCldResult(type, msg) {
+  const box = document.getElementById('cldResult');
+  document.getElementById('cldResultMsg').textContent = msg;
+  box.className = 'result-box show ' + type;
+}
+
+function copyUrl() {
+  const inp = document.getElementById('cldUrlOutput');
+  inp.select(); document.execCommand('copy');
+  const btn = event.target; btn.textContent = '✅ Copied!';
+  setTimeout(() => btn.textContent = '📋 Copy', 1500);
+}
+
+// ── Google Drive Converter ─────────────────────────────────
+function extractDriveId(url) {
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+function convertDrivePreview() {
+  const url = document.getElementById('driveInput').value.trim();
+  const id = extractDriveId(url);
+  if (!id) return showDriveResult('error', '❌ Could not find file ID. Make sure it is a valid Google Drive share link.');
+  const preview = `https://drive.google.com/file/d/${id}/preview`;
+  document.getElementById('driveUrlOutput').value = preview;
+  document.getElementById('driveCopyRow').style.display = 'flex';
+  showDriveResult('success', `✅ Preview URL (use in PDF iframe src):`);
+}
+function convertDriveDirect() {
+  const url = document.getElementById('driveInput').value.trim();
+  const id = extractDriveId(url);
+  if (!id) return showDriveResult('error', '❌ Could not find file ID.');
+  const direct = `https://drive.google.com/uc?export=download&id=${id}`;
+  document.getElementById('driveUrlOutput').value = direct;
+  document.getElementById('driveCopyRow').style.display = 'flex';
+  showDriveResult('success', `✅ Direct download URL (use in "bookPdf" field):`);
+}
+function showDriveResult(type, msg) {
+  const box = document.getElementById('driveResult');
+  document.getElementById('driveResultMsg').textContent = msg;
+  box.className = 'result-box show ' + type;
+}
+function copyDriveUrl() {
+  const inp = document.getElementById('driveUrlOutput');
+  inp.select(); document.execCommand('copy');
+  const btn = event.target; btn.textContent = '✅ Copied!';
+  setTimeout(() => btn.textContent = '📋 Copy', 1500);
+}
+
+// ── JSON Snippet Generators ────────────────────────────────
+function genNoteSnippet() {
+  const title   = document.getElementById('noteTitle').value.trim() || 'Untitled Note';
+  const content = document.getElementById('noteContent').value;
+  const json = JSON.stringify({ title, content }, null, 2);
+  document.getElementById('noteSnippetCode').textContent = json;
+  document.getElementById('noteSnippet').style.display = 'block';
+}
+function genPYQSnippet() {
+  const year     = parseInt(document.getElementById('pyqYear').value)   || 2024;
+  const marks    = parseInt(document.getElementById('pyqMarks').value)  || 1;
+  const question = document.getElementById('pyqQ').value.trim() || 'Sample question?';
+  const answer   = document.getElementById('pyqA').value.trim() || 'Sample answer.';
+  const json = JSON.stringify({ year, marks, question, answer }, null, 2);
+  document.getElementById('pyqSnippetCode').textContent = json;
+  document.getElementById('pyqSnippet').style.display = 'block';
+}
+function genChapterSnippet() {
+  const id    = parseInt(document.getElementById('chId').value) || 1;
+  const title = document.getElementById('chTitle').value.trim() || 'Chapter Title';
+  const pdf   = document.getElementById('chPdf').value.trim() || null;
+  const obj = { id, title, notes: [], pyqs: [], worksheet: [], bookQna: [], bookPdf: pdf };
+  const json = JSON.stringify(obj, null, 2);
+  document.getElementById('chSnippetCode').textContent = json;
+  document.getElementById('chSnippet').style.display = 'block';
+}
+function copySnippet(elId) {
+  const el = document.getElementById(elId);
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = event.target; btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy JSON', 1500);
+  });
+}
+</script>
+</body>
+</html>

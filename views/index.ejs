@@ -1,0 +1,105 @@
+<%- include('partials/header') %>
+
+<main>
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-eyebrow">🎓 DAV Public School · Free Resources</div>
+        <h1 class="hero-title">
+          Study smarter,<br/>
+          not harder.<br/>
+          <em>You've got this.</em>
+        </h1>
+        <p class="hero-desc">Chapter notes, previous year questions, book PDFs, and an AI answer helper — all organized by class and subject for DAV students.</p>
+        <div class="hero-actions">
+          <a href="#pick-class" class="btn-primary">Choose Your Class →</a>
+          <a href="/ai-helper" class="btn-secondary">✨ Ask AI</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><div class="stat-num">10</div><div class="stat-label">Classes</div></div>
+          <div class="stat"><div class="stat-num">7</div><div class="stat-label">Subjects</div></div>
+          <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Free access</div></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card"><div class="hero-card-icon">📐</div><div class="hero-card-label">Maths</div></div>
+        <div class="hero-card"><div class="hero-card-icon">🔬</div><div class="hero-card-label">Science</div></div>
+        <div class="hero-card"><div class="hero-card-icon">🪔</div><div class="hero-card-label">Hindi</div></div>
+        <div class="hero-card"><div class="hero-card-icon">🌺</div><div class="hero-card-label">Odia</div></div>
+        <div class="hero-card" style="grid-column:span 2"><div class="hero-card-icon">🏆</div><div class="hero-card-label">PYQ Bank</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Bar -->
+<div class="features-bar">
+  <div class="features-scroll">
+    <div class="feature-chip">📝 Chapter Notes</div>
+    <div class="feature-chip">🏆 Previous Year Questions</div>
+    <div class="feature-chip">📄 Book PDFs</div>
+    <div class="feature-chip">🤖 AI Answer Helper</div>
+    <div class="feature-chip">🪔 Hindi Medium</div>
+    <div class="feature-chip">🌺 Odia Medium</div>
+    <div class="feature-chip">🆓 100% Free</div>
+    <div class="feature-chip">📱 Mobile Friendly</div>
+  </div>
+</div>
+
+<!-- Class Picker -->
+<section class="section" id="pick-class">
+  <div class="container">
+    <div class="section-header">
+      <h2>Choose Your Class</h2>
+      <p>From Class 3 to Class 12 — pick yours and start studying 🚀</p>
+    </div>
+    <div class="class-grid">
+      <% classes.forEach(c => { %>
+      <a href="/class/<%= c %>" class="class-card">
+        <div class="class-label">Class</div>
+        <div class="class-number"><%= c %></div>
+        <div class="class-sub">7 subjects</div>
+        <div class="class-arrow">→</div>
+      </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- Subjects overview -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header center">
+      <h2>All Subjects Covered</h2>
+      <p>Seven subjects, chapter by chapter — for every DAV student</p>
+    </div>
+    <div class="overview-grid">
+      <div class="overview-card"><div class="ov-icon">📐</div><h3>Mathematics</h3><p>Stepwise solutions, key formulas, and exam-pattern PYQs.</p></div>
+      <div class="overview-card"><div class="ov-icon">🔬</div><h3>Science</h3><p>Concepts with diagrams, definitions, and chapter summaries.</p></div>
+      <div class="overview-card"><div class="ov-icon">📖</div><h3>English</h3><p>Story summaries, grammar, comprehension, and writing tips.</p></div>
+      <div class="overview-card"><div class="ov-icon">🪔</div><h3>Hindi</h3><p>कविता सारांश, गद्यांश, और व्याकरण नोट्स।</p></div>
+      <div class="overview-card"><div class="ov-icon">🌺</div><h3>Odia</h3><p>ଗଦ୍ୟ, ପଦ୍ୟ ଏବଂ ବ୍ୟାକରଣ ନୋଟ୍ସ।</p></div>
+      <div class="overview-card"><div class="ov-icon">🌍</div><h3>Social Studies</h3><p>History, Geography, and Civics notes, maps, and timelines.</p></div>
+      <div class="overview-card"><div class="ov-icon">💻</div><h3>Computer</h3><p>Theory, concepts, and practical notes for all chapters.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- AI CTA -->
+<div class="ai-cta-section">
+  <div class="container">
+    <div class="ai-cta-card">
+      <div class="ai-cta-text">
+        <h2>Stuck on a question? 🤔</h2>
+        <p>Type any question and our AI helper gives you a clear, student-friendly explanation. Works for all subjects and all classes.</p>
+        <a href="/ai-helper" class="btn-primary">Try AI Helper →</a>
+      </div>
+      <div class="ai-cta-emoji">🤖</div>
+    </div>
+  </div>
+</div>
+</main>
+
+<%- include('partials/footer') %>

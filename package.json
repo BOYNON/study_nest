@@ -1,0 +1,26 @@
+{
+  "name": "studynest",
+  "version": "3.0.0",
+  "description": "DAV Public School study platform — Phase 3 with real-time DM chat",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "setup-users": "node scripts/createUser.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^17.4.0",
+    "ejs": "^5.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.17.3",
+    "mongoose": "^8.0.0",
+    "morgan": "^1.10.1",
+    "node-fetch": "^3.3.2",
+    "socket.io": "^4.8.1"
+  }
+}

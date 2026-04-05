@@ -1,0 +1,102 @@
+<%- include('partials/header') %>
+<main>
+<div class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb"><a href="/">Home</a><span class="sep">›</span><span>AI Helper</span></nav>
+    <h1>🤖 AI Answer Helper</h1>
+    <p>Type any question and get a clear, student-friendly explanation instantly.</p>
+  </div>
+</div>
+<div class="container page-content">
+  <div class="ai-page-wrap">
+    <div class="ai-card">
+      <div class="ai-form-row">
+        <div>
+          <label class="form-label" for="aiClass">Your Class</label>
+          <select class="form-select" id="aiClass">
+            <option value="">Select class</option>
+            <% [3,4,5,6,7,8,9,10,11,12].forEach(c => { %><option value="<%= c %>">Class <%= c %></option><% }) %>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="aiSubject">Subject</label>
+          <select class="form-select" id="aiSubject">
+            <option value="">Select subject</option>
+            <option>Mathematics</option>
+            <option>Science</option>
+            <option>English</option>
+            <option>Hindi</option>
+            <option>Odia</option>
+            <option>Social Studies</option>
+            <option>Computer</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:18px">
+        <label class="form-label" for="aiQuestion">Your Question</label>
+        <textarea class="form-textarea" id="aiQuestion" rows="4" placeholder="e.g. What is photosynthesis? How do we add fractions? What is the difference between simile and metaphor?"></textarea>
+      </div>
+      <button class="btn-primary btn-full" id="aiAskBtn">
+        <span id="btnText">Ask AI ✨</span>
+        <span id="btnLoad" style="display:none">Thinking... 🤔</span>
+      </button>
+    </div>
+
+    <div class="ai-response-box" id="aiResponse" style="display:none">
+      <div class="ai-resp-header">
+        <span>🤖 AI Answer</span>
+        <button class="ai-copy-btn" id="copyBtn">📋 Copy</button>
+      </div>
+      <div class="ai-resp-body" id="aiAnswerText"></div>
+    </div>
+
+    <div class="ai-tips-box">
+      <h3>💡 Tips for better answers</h3>
+      <ul>
+        <li>Be specific — instead of "explain math", try "how do I solve 2x + 5 = 15?"</li>
+        <li>Include your class for age-appropriate explanations</li>
+        <li>Works for all 7 subjects including Hindi and Odia</li>
+        <li>Add an OpenAI key in <code>.env</code> for real AI answers</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+document.getElementById('aiAskBtn').addEventListener('click', async () => {
+  const question = document.getElementById('aiQuestion').value.trim();
+  const subject  = document.getElementById('aiSubject').value;
+  const classNum = document.getElementById('aiClass').value;
+  if (!question) { alert('Please enter a question first!'); return; }
+
+  document.getElementById('btnText').style.display = 'none';
+  document.getElementById('btnLoad').style.display = 'inline';
+  document.getElementById('aiAskBtn').disabled = true;
+  document.getElementById('aiResponse').style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({question,subject,classNum}) });
+    const data = await res.json();
+    if (data.success) {
+      const html = data.answer.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+      document.getElementById('aiAnswerText').innerHTML = html;
+      document.getElementById('aiResponse').style.display = 'block';
+      document.getElementById('aiResponse').scrollIntoView({ behavior:'smooth', block:'nearest' });
+    } else { alert(data.error || 'Something went wrong.'); }
+  } catch { alert('Network error. Check your connection.'); }
+  finally {
+    document.getElementById('btnText').style.display = 'inline';
+    document.getElementById('btnLoad').style.display = 'none';
+    document.getElementById('aiAskBtn').disabled = false;
+  }
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('aiAnswerText').innerText).then(() => {
+    document.getElementById('copyBtn').textContent = '✅ Copied!';
+    setTimeout(() => document.getElementById('copyBtn').textContent = '📋 Copy', 2000);
+  });
+});
+</script>
+<%- include('partials/footer') %>

@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+<main>
+<div class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb"><a href="/">Home</a><span class="sep">›</span><span>Class <%= classNum %></span></nav>
+    <h1>Class <em><%= classNum %></em></h1>
+    <p>Select a subject to explore notes, PYQs & book PDFs</p>
+    <div class="page-hero-meta">
+      <span class="hero-tag">📚 DAV Syllabus</span>
+      <span class="hero-tag">7 Subjects</span>
+    </div>
+  </div>
+</div>
+<div class="container page-content">
+  <div class="subject-grid">
+    <% const colorMap = { math:'math',science:'sci',english:'eng',hindi:'hindi',odia:'odia',social:'social',computer:'comp' }; %>
+    <% subjects.forEach(sub => {
+      const hasChapters = classData && classData[sub] && classData[sub].chapters && classData[sub].chapters.length > 0;
+      const cc = colorMap[sub] || 'math';
+    %>
+    <a href="/class/<%= classNum %>/<%= sub %>" class="subject-card sub-<%= cc %>">
+      <div class="subject-icon-wrap"><%= subjectIcons[sub] %></div>
+      <div class="subject-info">
+        <div class="subject-name"><%= subjectNames[sub] %></div>
+        <% if (hasChapters) { %>
+        <div class="subject-meta"><%= classData[sub].chapters.length %> chapter<%= classData[sub].chapters.length !== 1 ? 's' : '' %> available</div>
+        <% } else { %>
+        <div class="subject-meta"><span class="coming-pill">Coming Soon 📚✨</span></div>
+        <% } %>
+      </div>
+      <div class="subject-arrow">›</div>
+    </a>
+    <% }) %>
+  </div>
+</div>
+</main>
+<%- include('partials/footer') %>

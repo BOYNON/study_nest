@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "username": "admin",
+      "displayName": "Admin",
+      "password": "admin1234",
+      "role": "admin",
+      "avatarColor": "#ef4444"
+    },
+    {
+      "username": "ISHA",
+      "displayName": "ISHA",
+      "password": "Ipsita@123",
+      "role": "user",
+      "avatarColor": "#6366f1"
+    },
+    {
+      "username": "SANKET",
+      "displayName": "SANKET",
+      "password": "Sanket@123",
+      "role": "user",
+      "avatarColor": "#ec4899"
+    }
+  ]
+}
