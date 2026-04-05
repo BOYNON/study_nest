@@ -15,17 +15,6 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // ─────────────────────────────────────────────
-// FIX 1: ROOT ROUTE — redirect based on login state
-// ─────────────────────────────────────────────
-app.get('/', (req, res) => {
-  if (req.session && req.session.userId) {
-    res.redirect('/class');         // already logged in → study page
-  } else {
-    res.redirect('/secret/enter'); // not logged in → login page
-  }
-});
-
-// ─────────────────────────────────────────────
 // Markdown Renderer
 // ─────────────────────────────────────────────
 function renderMarkdown(text) {
@@ -56,7 +45,7 @@ function renderMarkdown(text) {
 app.locals.renderMarkdown = renderMarkdown;
 
 // ─────────────────────────────────────────────
-// Middleware
+// Basic Middleware
 // ─────────────────────────────────────────────
 app.use(morgan('dev'));
 app.use(express.json());
@@ -114,7 +103,7 @@ async function startApp() {
 
   const store = await buildSessionStore();
 
-  // FIX 2: trust proxy — required for secure cookies behind Render's HTTPS
+  // Required for secure cookies behind Render's HTTPS proxy
   app.set('trust proxy', 1);
 
   const sessionMiddleware = session({
@@ -136,6 +125,18 @@ async function startApp() {
 
   const { attachUser } = require('./middleware/auth');
   app.use(attachUser);
+
+  // ─────────────────────────────────────────────
+  // ROOT ROUTE — must be AFTER session middleware
+  // so req.session is available when this runs
+  // ─────────────────────────────────────────────
+  app.get('/', (req, res) => {
+    if (req.session && req.session.userId) {
+      res.redirect('/class');         // logged in → study page
+    } else {
+      res.redirect('/secret/enter'); // not logged in → login page
+    }
+  });
 
   // ─────────────────────────────────────────────
   // Routes
