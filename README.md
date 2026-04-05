@@ -262,3 +262,4 @@ MAX_CHAT_MESSAGES=1000
 - **MongoDB** = users + text
 - **Cloudinary** = images
 - **.env** = secrets
+"# study_nest" 
