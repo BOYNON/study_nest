@@ -263,3 +263,4 @@ MAX_CHAT_MESSAGES=1000
 - **Cloudinary** = images
 - **.env** = secrets
 "# study_nest" 
+"# study_nest" 
