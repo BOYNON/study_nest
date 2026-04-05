@@ -127,19 +127,10 @@ async function startApp() {
   app.use(attachUser);
 
   // ─────────────────────────────────────────────
-  // ROOT ROUTE — must be AFTER session middleware
-  // so req.session is available when this runs
-  // ─────────────────────────────────────────────
-  app.get('/', (req, res) => {
-    if (req.session && req.session.userId) {
-      res.redirect('/class');         // logged in → study page
-    } else {
-      res.redirect('/secret/enter'); // not logged in → login page
-    }
-  });
-
-  // ─────────────────────────────────────────────
   // Routes
+  // NOTE: No app.get('/') here — routes/index.js handles '/' and
+  // renders the study page publicly with no login required.
+  // Only /secret/* needs authentication (handled inside secret.js).
   // ─────────────────────────────────────────────
   app.use('/',       require('./routes/index'));
   app.use('/class',  require('./routes/class'));
