@@ -77,7 +77,7 @@ async function buildSessionStore() {
   if (!process.env.MONGODB_URI) return undefined;
   try {
     const mongoose = require('mongoose');
-    const MongoStore = require("connect-mongo");
+    const MongoStore = require('connect-mongo');
 
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB connected');
@@ -106,53 +106,75 @@ async function startApp() {
   app.set('trust proxy', 1);
 
   const sessionMiddleware = session({
-    name:'studynest.sid',
+    name: 'studynest.sid',
     secret: process.env.SESSION_SECRET || 'sn-dev-secret-CHANGE-IN-PROD',
-    resave:false,
-    saveUninitialized:false,
+    resave: false,
+    saveUninitialized: false,
     store,
-    cookie:{
-      httpOnly:true,
-      secure:process.env.NODE_ENV==='production',
-      maxAge:7200000,
-      sameSite:'lax'
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7200000,
+      sameSite: 'lax'
     },
   });
 
   app.use(sessionMiddleware);
-  io.use((socket, next) => sessionMiddleware(socket.request, socket.request.res||{}, next));
+  io.use((socket, next) => sessionMiddleware(socket.request, socket.request.res || {}, next));
 
   const { attachUser } = require('./middleware/auth');
   app.use(attachUser);
 
   // ─────────────────────────────────────────────
   // Routes
-  // routes/index.js handles '/' publicly — no login required
-  // Only /secret/* needs authentication (handled inside secret.js)
   // ─────────────────────────────────────────────
   app.use('/',       require('./routes/index'));
   app.use('/class',  require('./routes/class'));
   app.use('/api',    require('./routes/api'));
   app.use('/secret', require('./routes/secret')(io, onlineUsers));
 
-  app.use((_req,res) => res.status(404).render('404',{title:'404 – Not Found'}));
+  app.use((_req, res) => res.status(404).render('404', { title: '404 – Not Found' }));
 
   // ─────────────────────────────────────────────
   // Socket.io
-  // Messages are stored permanently in MongoDB.
-  // No automatic pruning — chats are kept forever
-  // until manually wiped by admin or Atlas storage
-  // is full (free tier = 512MB).
   // ─────────────────────────────────────────────
   let Message = null;
 
   function tryLoadMessage() {
     try {
       const mongoose = require('mongoose');
-      if (mongoose.connection.readyState===1 && !Message) {
+      if (mongoose.connection.readyState === 1 && !Message) {
         Message = require('./models/Message');
       }
     } catch {}
+  }
+
+  // Fetch history for a room and emit back to the requesting socket
+  async function sendHistory(socket, room) {
+    tryLoadMessage();
+    if (!Message) {
+      socket.emit('history', []);
+      return;
+    }
+    try {
+      const msgs = await Message
+        .find({ room, deleted: { $ne: true } })
+        .sort({ createdAt: 1 })
+        .limit(200)
+        .lean();
+      socket.emit('history', msgs);
+    } catch (err) {
+      console.error('History fetch error:', err.message);
+      socket.emit('history', []);
+    }
+  }
+
+  function broadcastOnlineList(room) {
+    const list = [];
+    onlineUsers.forEach(u => {
+      if (u.room === room) list.push(u);
+    });
+    io.to(room).emit('online-list', list);
   }
 
   io.on('connection', (socket) => {
@@ -164,44 +186,116 @@ async function startApp() {
     }
 
     const user = {
-      id: sess.userId,
-      username: sess.username,
+      id:          sess.userId,
+      username:    sess.username,
       displayName: sess.displayName,
       avatarColor: sess.avatarColor,
-      role: sess.role,
-      room: 'general'
+      role:        sess.role,
+      room:        'general'
     };
 
     onlineUsers.set(socket.id, user);
-    socket.join('general');
 
-    socket.on('message', async(data) => {
+    // ── join-room: client calls this on connect + room switch ──
+    socket.on('join-room', async (room) => {
+      // Validate room access
+      if (!room) return;
+      if (room !== 'general' && !isDMRoom(room, user.id)) return;
 
-      if (!checkRateLimit(user.id)) return;
+      // Leave previous room
+      if (user.room) {
+        socket.leave(user.room);
+        broadcastOnlineList(user.room);
+      }
+
+      // Join new room
+      user.room = room;
+      onlineUsers.set(socket.id, user);
+      socket.join(room);
+
+      // Send history to this socket
+      await sendHistory(socket, room);
+
+      // Broadcast updated online list
+      broadcastOnlineList(room);
+    });
+
+    // ── message ───────────────────────────────────────────────
+    socket.on('message', async (data) => {
+
+      if (!checkRateLimit(user.id)) {
+        socket.emit('rate-limited');
+        return;
+      }
 
       const msgData = {
-        room: user.room,
-        sender: user,
-        text: data.text || '',
-        imageUrl: data.imageUrl || '',
-        linkUrl: data.linkUrl || '',
-        voiceUrl: data.voiceUrl || '',
+        room:      user.room,
+        sender:    user,
+        text:      data.text      || '',
+        imageUrl:  data.imageUrl  || '',
+        linkUrl:   data.linkUrl   || '',
+        voiceUrl:  data.voiceUrl  || '',
         createdAt: new Date()
       };
 
       tryLoadMessage();
 
-      // Save message permanently — no pruning after save
+      // Save permanently to MongoDB — no pruning
       if (Message) {
-        const saved = await new Message(msgData).save();
-        msgData._id = saved._id.toString();
+        try {
+          const saved = await new Message(msgData).save();
+          msgData._id = saved._id.toString();
+        } catch (err) {
+          console.error('Message save error:', err.message);
+        }
       }
 
       io.to(user.room).emit('message', msgData);
     });
 
+    // ── typing ────────────────────────────────────────────────
+    socket.on('typing', (isTyping) => {
+      socket.to(user.room).emit('typing', {
+        displayName: user.displayName,
+        isTyping: !!isTyping
+      });
+    });
+
+    // ── delete message ────────────────────────────────────────
+    socket.on('delete-message', async (msgId) => {
+      tryLoadMessage();
+      if (!Message || !msgId) return;
+      try {
+        const msg = await Message.findById(msgId);
+        if (!msg) return;
+        const canDelete = msg.sender.id === user.id || user.role === 'admin';
+        if (!canDelete) return;
+        msg.deleted = true;
+        await msg.save();
+        io.to(user.room).emit('message-deleted', msgId);
+      } catch (err) {
+        console.error('Delete error:', err.message);
+      }
+    });
+
+    // ── admin wipe ────────────────────────────────────────────
+    socket.on('wipe-room', async (room) => {
+      if (user.role !== 'admin') return;
+      tryLoadMessage();
+      if (!Message) return;
+      try {
+        await Message.deleteMany({ room: room || user.room });
+        io.to(room || user.room).emit('room-wiped', room || user.room);
+      } catch (err) {
+        console.error('Wipe error:', err.message);
+      }
+    });
+
+    // ── disconnect ────────────────────────────────────────────
     socket.on('disconnect', () => {
+      const leftRoom = user.room;
       onlineUsers.delete(socket.id);
+      if (leftRoom) broadcastOnlineList(leftRoom);
     });
 
   });
