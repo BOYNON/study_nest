@@ -1,14 +1,33 @@
 {
-  "classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  "subjects": ["math", "science", "english", "hindi", "odia", "social", "computer"],
+  "classes": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "subjects": [
+    "math",
+    "science",
+    "english",
+    "hindi",
+    "odia",
+    "ssc",
+    "computer"
+  ],
   "subjectNames": {
     "math": "Mathematics",
     "science": "Science",
     "english": "English",
     "hindi": "Hindi",
     "odia": "Odia",
-    "social": "Social Studies",
-    "computer": "Computer"
+    "computer": "Computer",
+    "ssc": "SSC"
   },
   "subjectIcons": {
     "math": "📐",
@@ -16,8 +35,8 @@
     "english": "📖",
     "hindi": "🪔",
     "odia": "🌺",
-    "social": "🌍",
-    "computer": "💻"
+    "computer": "💻",
+    "ssc": "🌍"
   },
   "subjectColors": {
     "math": "blue",
@@ -25,167 +44,260 @@
     "english": "purple",
     "hindi": "orange",
     "odia": "rose",
-    "social": "amber",
-    "computer": "cyan"
+    "computer": "cyan",
+    "ssc": "amber"
   },
   "content": {
     "3": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": []
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "4": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": []
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "5": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": []
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "6": {
       "math": {
-        "chapters": [
-          {
-            "id": 1, "title": "Knowing Our Numbers",
-            "notes": [
-              { "title": "Introduction to Large Numbers", "content": "In this chapter, we learn about large numbers up to crores.\n\n**Indian System:**\n- Ones, Tens, Hundreds\n- Thousands, Ten Thousands\n- Lakhs, Ten Lakhs\n- Crores\n\n**Key Points:**\n1. 1 Lakh = 1,00,000\n2. 1 Crore = 1,00,00,000\n3. Commas help us read large numbers easily\n\n**Example:** 5,32,40,819 → Five crore thirty-two lakh forty thousand eight hundred nineteen." },
-              { "title": "Comparing Numbers", "content": "To compare two numbers:\n1. Count the digits — more digits means larger number\n2. If digits are equal, compare from leftmost digit\n\n**Remember:** The greatest 4-digit number is 9999, and the smallest 5-digit number is 10000." }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "Write the greatest 6-digit number using digits 3, 0, 5, 8, 1, 9 (each used once).", "answer": "985310", "marks": 2 },
-              { "year": 2022, "question": "How many 4-digit numbers are there in all?", "answer": "There are 9000 four-digit numbers (from 1000 to 9999).", "marks": 2 },
-              { "year": 2023, "question": "Insert commas in 74836512 as per Indian system and write in words.", "answer": "7,48,36,512 — Seven crore forty-eight lakh thirty-six thousand five hundred twelve.", "marks": 3 }
-            ],
-            "bookPdf": null
-          },
-          {
-            "id": 2, "title": "Whole Numbers",
-            "notes": [
-              { "title": "Introduction to Whole Numbers", "content": "**Natural Numbers:** 1, 2, 3, 4, ...\n\n**Whole Numbers:** 0, 1, 2, 3, 4, ...\n\nThe only difference is that whole numbers include **zero**.\n\n**Properties:**\n1. **Closure:** Sum of any two whole numbers is a whole number\n2. **Commutative:** a + b = b + a\n3. **Associative:** (a + b) + c = a + (b + c)\n4. **Distributive:** a × (b + c) = a×b + a×c\n5. **Additive Identity:** a + 0 = a\n6. **Multiplicative Identity:** a × 1 = a" }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "What is the predecessor of the smallest 6-digit number?", "answer": "99999 (predecessor of 100000)", "marks": 1 }
-            ],
-            "bookPdf": null
-          }
-        ]
+        "chapters": []
       },
       "science": {
-        "chapters": [
-          {
-            "id": 1, "title": "Food: Where Does It Come From?",
-            "notes": [
-              { "title": "Sources of Food", "content": "**Plants as Food Source:**\nWe eat different parts of plants:\n- **Roots:** Carrot, radish, turnip\n- **Stems:** Potato, sugarcane, ginger\n- **Leaves:** Spinach, cabbage, lettuce\n- **Flowers:** Cauliflower, broccoli\n- **Fruits:** Mango, apple, banana\n- **Seeds:** Rice, wheat, dal\n\n**Animals as Food Source:**\nMilk, eggs, meat, fish, honey\n\n**Types based on Food:**\n- **Herbivores:** Eat only plants (cow, rabbit)\n- **Carnivores:** Eat only animals (lion, tiger)\n- **Omnivores:** Eat both (humans, crow, bear)" }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "Name two food items obtained from flowers.", "answer": "Cauliflower and Broccoli", "marks": 2 },
-              { "year": 2022, "question": "What are herbivores? Give two examples.", "answer": "Animals that eat only plants are called herbivores. Examples: Cow, Goat", "marks": 2 }
-            ],
-            "bookPdf": null
-          }
-        ]
+        "chapters": []
       },
       "english": {
-        "chapters": [
-          {
-            "id": 1, "title": "Who Did Patrick's Homework?",
-            "notes": [
-              { "title": "Story Summary", "content": "**About the Story:**\nPatrick hated homework. One day he found a little elf and saved him from a cat. The elf granted him one wish — Patrick wished for the elf to do all his homework.\n\n**Key Events:**\n- The elf didn't know school subjects and kept asking Patrick for help\n- Patrick had to explain math, grammar, and history\n- By helping the elf, Patrick himself learned everything\n- His teachers were amazed\n\n**Moral:** There is no shortcut to learning. Helping others leads to self-improvement." }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "Why did the little elf keep asking Patrick for help?", "answer": "The elf did not know math, English grammar, or history. He was not familiar with human school subjects, so he kept asking Patrick to explain things.", "marks": 3 }
-            ],
-            "bookPdf": null
-          }
-        ]
+        "chapters": []
       },
       "hindi": {
-        "chapters": [
-          {
-            "id": 1, "title": "वह चिड़िया जो",
-            "notes": [
-              { "title": "कविता का सारांश", "content": "**कवि:** केदारनाथ अग्रवाल\n\n**मुख्य भाव:**\nइस कविता में कवि एक नीले पंखों वाली चिड़िया के बारे में बताते हैं। चिड़िया को जंगल से बहुत प्यार है।\n\n**प्रमुख बातें:**\n- चिड़िया छोटी है पर बहुत साहसी है\n- वह मुँह में दाना लेकर गाती है\n- वह नदी की तेज धारा से पानी पीती है\n- कवि इस चिड़िया को बहुत पसंद करते हैं\n\n**महत्वपूर्ण शब्द:**\n- विजन = जंगल\n- रेवा = नर्मदा नदी" }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "चिड़िया कहाँ से पानी पीती है?", "answer": "चिड़िया नदी की तेज धारा से पानी पीती है।", "marks": 2 },
-              { "year": 2022, "question": "'विजन' शब्द का अर्थ क्या है?", "answer": "विजन का अर्थ है जंगल।", "marks": 1 }
-            ],
-            "bookPdf": null
-          },
-          {
-            "id": 2, "title": "बचपन",
-            "notes": [
-              { "title": "संस्मरण का सारांश", "content": "**लेखिका:** कृष्णा सोबती\n\n**विषय:** लेखिका अपने बचपन की यादें साझा करती हैं। वे बताती हैं कि बचपन में उन्हें क्या-क्या पसंद था।\n\n**मुख्य बातें:**\n- लेखिका को चॉकलेट, आइसक्रीम और पेपरमेंट पसंद थे\n- वे मोज़े और जूते पहनना पसंद नहीं करती थीं\n- उन्हें फ्रॉक पहनना और बाल खुले रखना पसंद था\n- अब वे सलवार-कमीज़ और साड़ी पहनती हैं" }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "बचपन में लेखिका को क्या-क्या खाना पसंद था?", "answer": "बचपन में लेखिका को चॉकलेट, आइसक्रीम, पेपरमेंट और अचार पसंद थे।", "marks": 2 }
-            ],
-            "bookPdf": null
-          }
-        ]
+        "chapters": []
       },
       "odia": {
-        "chapters": [
-          {
-            "id": 1, "title": "ଆମ ଓଡ଼ିଶା",
-            "notes": [
-              { "title": "ପ୍ରଥମ ପାଠ ସାରାଂଶ", "content": "**ଓଡ଼ିଶା ରାଜ୍ୟ:**\nଓଡ଼ିଶା ଭାରତର ଏକ ସୁନ୍ଦର ରାଜ୍ୟ। ଏହାର ରାଜଧାନୀ ଭୁବନେଶ୍ୱର।\n\n**ମୁଖ୍ୟ ତଥ୍ୟ:**\n- ଓଡ଼ିଶାର ରାଜ୍ୟ ପଶୁ: ହାତୀ\n- ରାଜ୍ୟ ପକ୍ଷୀ: ଭାରତୀୟ ଟଣ୍ଡ ଅଲ\n- ରାଜ୍ୟ ଫୁଲ: ଅଶୋକ\n- ରାଜ୍ୟ ଗଛ: ଅଶ୍ୱତ୍ଥ\n\n**ଓଡ଼ିଶାର ନଦୀ:**\nମହାନଦୀ, ବ୍ରାହ୍ମଣୀ, ବୈତରଣୀ ଓ ଋଷିକୁଲ୍ୟା।" }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "ଓଡ଼ିଶାର ରାଜଧାନୀ କ'ଣ?", "answer": "ଓଡ଼ିଶାର ରାଜଧାନୀ ଭୁବନେଶ୍ୱର।", "marks": 1 }
-            ],
-            "bookPdf": null
-          }
-        ]
+        "chapters": []
       },
-      "social": { "chapters": [] },
-      "computer": { "chapters": [] }
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "7": {
       "math": {
-        "chapters": [
-          {
-            "id": 1, "title": "Integers",
-            "notes": [
-              { "title": "Introduction to Integers", "content": "**Integers** include all positive numbers, negative numbers, and zero.\n\n**Rules for Multiplication:**\n- (+) × (+) = (+)\n- (−) × (−) = (+)\n- (+) × (−) = (−)\n- (−) × (+) = (−)" }
-            ],
-            "pyqs": [
-              { "year": 2023, "question": "Calculate: (−15) × 8 + (−15) × 2", "answer": "(−15) × (8+2) = (−15) × 10 = −150", "marks": 2 }
-            ],
-            "bookPdf": null
-          }
-        ]
+        "chapters": []
       },
-      "science": { "chapters": [] }, "english": { "chapters": [] },
-      "hindi": { "chapters": [] }, "odia": { "chapters": [] },
-      "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "8": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": [      {
+        "id": 1,
+        "title": "Squares and Square Roots",
+
+        "notes": [
+          { "title": "Squares and Square Roots", "content": "COMING SOON!" }
+        ],
+
+        "pyqs": [
+          {}
+        ],
+
+        "worksheet": [
+          {}
+        ],
+
+        "bookPdf": "https://drive.google.com/file/d/12cRjW9Y-bto5T0faXLfE9bB2kJX8pQQ1/view?usp=drive_link",
+
+        "bookQna": [
+          {}
+        ]
+      }]
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "9": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": []
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "10": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": []
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "11": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": []
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     },
     "12": {
-      "math": { "chapters": [] }, "science": { "chapters": [] },
-      "english": { "chapters": [] }, "hindi": { "chapters": [] },
-      "odia": { "chapters": [] }, "social": { "chapters": [] }, "computer": { "chapters": [] }
+      "math": {
+        "chapters": []
+      },
+      "science": {
+        "chapters": []
+      },
+      "english": {
+        "chapters": []
+      },
+      "hindi": {
+        "chapters": []
+      },
+      "odia": {
+        "chapters": []
+      },
+      "computer": {
+        "chapters": []
+      },
+      "ssc": {
+        "chapters": []
+      }
     }
   }
 }

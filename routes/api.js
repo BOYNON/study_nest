@@ -1,6 +1,40 @@
 const express = require('express');
 const router = express.Router();
 
+// ─────────────────────────────────────────────
+// GET /api/messages — load chat history
+// ─────────────────────────────────────────────
+router.get('/messages', async (req, res) => {
+  if (!req.session?.userId) {
+    return res.status(401).json({ messages: [] });
+  }
+
+  try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      return res.json({ messages: [] });
+    }
+
+    const Message = require('../models/Message');
+    const room    = req.query.room  || 'general';
+    const limit   = Math.min(Number(req.query.limit) || 200, 500);
+
+    const messages = await Message
+      .find({ room, deleted: { $ne: true } })
+      .sort({ createdAt: 1 })
+      .limit(limit)
+      .lean();
+
+    res.json({ messages });
+  } catch (err) {
+    console.error('Failed to load messages:', err);
+    res.status(500).json({ messages: [] });
+  }
+});
+
+// ─────────────────────────────────────────────
+// Gemini AI helper
+// ─────────────────────────────────────────────
 function buildPrompt(question, subject, classNum) {
   return `You are a helpful study assistant for Class ${classNum || 'school'} students. Answer clearly, simply and briefly. Subject: ${subject || 'general'}.
 
@@ -50,7 +84,7 @@ async function askGemini(question, subject, classNum) {
   throw new Error(lastError || 'Gemini request failed');
 }
 
-// POST /api/ask — AI Answer Helper (Gemini API)
+// POST /api/ask — AI Answer Helper
 router.post('/ask', async (req, res) => {
   const { question, subject, classNum } = req.body;
   if (!question || question.trim().length < 3) {

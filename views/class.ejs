@@ -13,7 +13,7 @@
 </div>
 <div class="container page-content">
   <div class="subject-grid">
-    <% const colorMap = { math:'math',science:'sci',english:'eng',hindi:'hindi',odia:'odia',social:'social',computer:'comp' }; %>
+    <% const colorMap = { math:'math',science:'sci',english:'eng',hindi:'hindi',odia:'odia',ssc:'ssc',computer:'comp' }; %>
     <% subjects.forEach(sub => {
       const hasChapters = classData && classData[sub] && classData[sub].chapters && classData[sub].chapters.length > 0;
       const cc = colorMap[sub] || 'math';
