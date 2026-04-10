@@ -20,13 +20,6 @@
       "password": "Sanket@123",
       "role": "user",
       "avatarColor": "#ec4899"
-    },
-        {
-      "username": "Pihu",
-      "displayName": "Prajakta",
-      "password": "Pihu@123",
-      "role": "user",
-      "avatarColor": "#ec4899"
     }
   ]
 }
